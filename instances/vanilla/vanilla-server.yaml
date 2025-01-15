@@ -1,4 +1,4 @@
-nameOverride: "vanilla"
+nameOverride: "vanilla-minecraft"
 fullnameOverride: "vanilla-minecraft-server"
 
 minecraft:
@@ -24,8 +24,8 @@ resources:
 
 volumes:
   data:
-    hostPath: "/home/brark/minecraft-server/instances/vanilla/minecraft-data"
+    hostPath: "./minecraft-data"
 
 service:
-  type: NodePort
+  type: LoadBalancer
   port: 25565

@@ -28,10 +28,10 @@ resources:
 
 volumes:
   data:
-    hostPath: "/home/brark/minecraft-server/instances/modded/minecraft-data"
+    hostPath: "./minecraft-data"
   addons:
-    hostPath: "/home/brark/minecraft-server/instances/modded/addons"
+    hostPath: "./addons"
 
 service:
-  type: NodePort
+  type: LoadBalancer
   port: 25565
