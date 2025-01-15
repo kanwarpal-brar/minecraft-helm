@@ -1,0 +1,103 @@
+{{- $fullName := include "minecraft-server.fullname" . -}}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-config
+  labels:
+    {{- include "minecraft-server.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
+data:
+  EULA: {{ .Values.minecraft.eula | quote }}
+  VERSION: {{ .Values.minecraft.version | quote }}
+  OPS: {{ .Values.minecraft.ops | quote }}
+  VIEW_DISTANCE: {{ .Values.minecraft.viewDistance | quote }}
+  SERVER_NAME: {{ .Values.minecraft.serverName | quote }}
+  MAX_PLAYERS: {{ .Values.minecraft.maxPlayers | quote }}
+  INITIAL_MEMORY: {{ .Values.minecraft.initialMemory | quote }}
+  MAX_MEMORY: {{ .Values.minecraft.maxMemory | quote }}
+  ENABLE_AUTOPAUSE: {{ .Values.minecraft.enableAutopause | quote }}
+  MODPACK_PLATFORM: {{ .Values.minecraft.modpackPlatform | quote }}
+  MODRINTH_MODPACK: {{ .Values.minecraft.modrinthModpack | quote }}
+  PLUGINS: {{ .Values.minecraft.plugins | quote }}
+  MODRINTH_EXCLUDE_FILES: {{ .Values.minecraft.modrinthExcludeFiles | quote }}
+  MAX_TICK_TIME: {{ .Values.minecraft.maxTickTime | quote }}
+  ONLINE_MODE: {{ .Values.minecraft.onlineMode | quote }}
+  ENABLE_RCON: {{ .Values.minecraft.enableRcon | quote }}
+  ENABLE_COMMAND_BLOCK: {{ .Values.minecraft.enableCommandBlock | quote }}
+  ENFORCE_SECURE_PROFILE: {{ .Values.minecraft.enforceSecureProfile | quote }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "minecraft-server.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "minecraft-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "minecraft-server.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: minecraft-server
+          image: itzg/minecraft-server
+          envFrom:
+            - configMapRef:
+                name: {{ $fullName }}-config
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          stdin: true
+          tty: true
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              hostPort: {{ .Values.service.port }}
+              protocol: TCP
+            - containerPort: {{ .Values.service.port }}
+              hostPort: {{ .Values.service.port }}
+              protocol: UDP
+          volumeMounts:
+            - name: minecraft-data
+              mountPath: /data
+            - name: minecraft-addons
+              mountPath: /addons
+      volumes:
+        - name: minecraft-data
+          hostPath:
+            path: {{ .Values.volumes.data.hostPath }}
+            type: DirectoryOrCreate
+        - name: minecraft-addons
+          hostPath:
+            path: {{ .Values.volumes.addons.hostPath }}
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "minecraft-server.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "minecraft-server.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: minecraft-tcp
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+    - name: minecraft-udp
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: UDP

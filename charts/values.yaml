@@ -1,0 +1,37 @@
+nameOverride: ""
+fullnameOverride: ""
+
+minecraft:
+  eula: "TRUE"
+  version: "1.20.1"
+  ops: "SpacePiratePaul"
+  viewDistance: "16"
+  serverName: "K-Kube Minecraft"
+  maxPlayers: "4"
+  initialMemory: "1G"
+  maxMemory: "4G"
+  enableAutopause: "TRUE"
+  modpackPlatform: "MODRINTH"
+  modrinthModpack: "/addons/modpack.mrpack"
+  plugins: "/addons/dhs-server.jar"
+  modrinthExcludeFiles: "distanthorizons"
+  maxTickTime: "-1"
+  onlineMode: "TRUE"
+  enableRcon: "false"
+  enableCommandBlock: "false"
+  enforceSecureProfile: "TRUE"
+
+resources:
+  limits:
+    memory: "4Gi"
+    cpu: "2"
+
+volumes:
+  data:
+    hostPath: "/home/brark/minecraft-server/goobcraft/minecraft-data"
+  addons:
+    hostPath: "/home/brark/minecraft-server/goobcraft/addons"
+
+service:
+  type: LoadBalancer
+  port: 25565
