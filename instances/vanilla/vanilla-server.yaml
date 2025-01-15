@@ -1,0 +1,31 @@
+nameOverride: "vanilla"
+fullnameOverride: "vanilla-minecraft-server"
+
+minecraft:
+  eula: "TRUE"
+  version: "1.20.1"
+  ops: "SpacePiratePaul"
+  viewDistance: "16"
+  serverName: "K-Kube Minecraft Vanilla"
+  maxPlayers: "4"
+  initialMemory: "1G"
+  maxMemory: "4G"
+  enableAutopause: "TRUE"
+  maxTickTime: "-1"
+  onlineMode: "TRUE"
+  enableRcon: "false"
+  enableCommandBlock: "false"
+  enforceSecureProfile: "TRUE"
+
+resources:
+  limits:
+    memory: "4Gi"
+    cpu: "2"
+
+volumes:
+  data:
+    hostPath: "/home/brark/minecraft-server/instances/vanilla/minecraft-data"
+
+service:
+  type: NodePort
+  port: 25565
