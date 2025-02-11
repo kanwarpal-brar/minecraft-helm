@@ -25,6 +25,8 @@ resources:
 volumes:
   data:
     hostPath: "./minecraft-data"
+  addons:
+    hostPath: "./minecraft-addons"
 
 service:
   type: LoadBalancer
